@@ -2,8 +2,6 @@
 
 A practical framework for creating and governing **Key Performance Indicators (KPIs)**.
 
-**[TEST]**
-
 ## 1) Start from goals (OKRs)
 - **Objective (qualitative):** What outcome do we expect?
 - **Key Results (quantitative):** 2–4 measurable results that indicate progress.
@@ -97,5 +95,3 @@ Track at minimum:
 - Funnels: plan started → plan saved → validated
 - Cohorts: monthly retention by signup month
 - Segments: locale, platform, age group
-
-- This line is for testing the needs-sync workflow.
