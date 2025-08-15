@@ -1,28 +1,64 @@
 name: Mark locales as needs-sync
 on:
   pull_request:
-    paths: ["**/*.en.md"]
+    paths: ["**/*.en.md"]   # მხოლოდ EN დოკების ცვლილებაზე ვრეაგირებთ
+
+permissions:
+  contents: write   # საჭიროა commit/push-სთვის
+
 jobs:
   mark:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Mark corresponding KA/RU files as needs-sync
+        with:
+          fetch-depth: 0  # გვჭირდება base/head diff
+
+      - name: Compute changed EN files
+        id: diff
         run: |
-          base_ref=${{ github.base_ref }}
-          changed=$(git diff --name-only origin/${base_ref}... | grep '\.en\.md$' || true)
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.sha }}"
+          git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep '\.en\.md$' || true
+
+      - name: Mark corresponding KA/RU files
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.sha }}"
+          changed=$(git diff --name-only "$BASE_SHA" "$HEAD_SHA" | grep '\.en\.md$' || true)
+          echo "Changed EN files:"
+          echo "$changed"
           for f in $changed; do
-            for locale in ka ru; do
-              loc_file=$(echo "$f" | sed "s/\/en\//\/$locale\//")
-              if [ -f "$loc_file" ]; then
-                sed -i 's/needs-sync: false/needs-sync: true/' "$loc_file"
-              fi
-            done
+            # 1) templates/.../en/.../Doc.en.md  -> templates/.../ka/.../Doc.ka.md & ru
+            if echo "$f" | grep -q '/en/'; then
+              for locale in ka ru; do
+                loc_file=$(echo "$f" | sed "s/\\/en\\//\\/$locale\\//; s/\\.en\\.md$/.${locale}.md/")
+                if [ -f "$loc_file" ]; then
+                  echo "Marking $loc_file"
+                  sed -i 's/needs-sync: *false/needs-sync: true/' "$loc_file"
+                else
+                  echo "Skip (not found): $loc_file"
+                fi
+              done
+            # 2) docs/Doc.en.md -> docs/Doc.ka.md & docs/Doc.ru.md
+            elif echo "$f" | grep -q '^docs/'; then
+              for locale in ka ru; do
+                loc_file=$(echo "$f" | sed "s/\\.en\\.md$/.${locale}.md/")
+                if [ -f "$loc_file" ]; then
+                  echo "Marking $loc_file"
+                  sed -i 's/needs-sync: *false/needs-sync: true/' "$loc_file" || true
+                else
+                  echo "Skip (not found): $loc_file"
+                fi
+              done
+            fi
           done
-      - name: Commit if changed
+
+      - name: Commit changes if any
         run: |
           git config user.name "i18n-bot"
           git config user.email "i18n@bot"
-          git add .
-          git commit -m "mark locales needs-sync" || echo "no changes"
-          git push
+          git add -A
+          git commit -m "i18n: mark locales needs-sync" || echo "No changes to commit"
+          git push || true
+
