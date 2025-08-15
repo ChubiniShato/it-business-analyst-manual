@@ -2,6 +2,8 @@
 
 A practical framework for creating and governing **Key Performance Indicators (KPIs)**.
 
+**[TEST]**
+
 ## 1) Start from goals (OKRs)
 - **Objective (qualitative):** What outcome do we expect?
 - **Key Results (quantitative):** 2–4 measurable results that indicate progress.
