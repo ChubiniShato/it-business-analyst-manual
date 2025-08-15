@@ -79,8 +79,7 @@ A practical framework for creating and governing **Key Performance Indicators (K
 5. **Data Quality Score (Input/Process)**
    - *Definition:* share of catalog items passing validation rules
    - *Target:* ≥ 98%
-   - *Something new
-
+   
 ---
 
 ## Instrumentation (analytics events)
