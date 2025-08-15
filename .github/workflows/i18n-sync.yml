@@ -1,0 +1,28 @@
+name: Mark locales as needs-sync
+on:
+  pull_request:
+    paths: ["**/*.en.md"]
+jobs:
+  mark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Mark corresponding KA/RU files as needs-sync
+        run: |
+          base_ref=${{ github.base_ref }}
+          changed=$(git diff --name-only origin/${base_ref}... | grep '\.en\.md$' || true)
+          for f in $changed; do
+            for locale in ka ru; do
+              loc_file=$(echo "$f" | sed "s/\/en\//\/$locale\//")
+              if [ -f "$loc_file" ]; then
+                sed -i 's/needs-sync: false/needs-sync: true/' "$loc_file"
+              fi
+            done
+          done
+      - name: Commit if changed
+        run: |
+          git config user.name "i18n-bot"
+          git config user.email "i18n@bot"
+          git add .
+          git commit -m "mark locales needs-sync" || echo "no changes"
+          git push

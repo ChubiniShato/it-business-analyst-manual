@@ -1,0 +1,6 @@
+kpi_id,name,objective,owner,definition,unit,direction,target,warning,critical,time_window,cadence,data_source,breakdowns,notes,version
+KPI-001,Limits Compliance Rate,Increase diet compliance,Product Analytics,compliant_days / total_days (rolling 30 days),%,higher_is_better,>=70,<60,<50,rolling_30d,weekly,"analytics.events, plans","locale, platform, age_group",Exclude users with <3 active days,1.1
+KPI-002,Plan Completion Time,Reduce friction in planning,Product Analytics,median(seconds_from_start_to_save),seconds,lower_is_better,<=90,<=120,>180,rolling_30d,weekly,analytics.events,platform,Use P95 as guardrail (<=180s),1.0
+KPI-003,Recipe Adjustment Adoption,Drive personalization,Product,plans_with_adjustment / plans_total × 100,%,higher_is_better,>=40,<30,<20,rolling_30d,monthly,analytics.events,"locale, plan_type",Proxy for engagement,1.0
+KPI-004,WAU Growth,Grow active user base,Growth,(WAU_current - WAU_prev) / WAU_prev × 100,%,higher_is_better,>=10,<5,<0,monthly,monthly,"user_activity, cohorts","market, platform",Exclude seasonal spikes where noted,1.0
+KPI-005,Data Quality Score,Improve catalog reliability,Data,valid_items / total_items × 100,%,higher_is_better,>=98,<95,<90,rolling_7d,weekly,catalog.validation,locale,Run daily validation job,1.0
